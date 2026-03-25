@@ -1,68 +1,79 @@
-import { useState, useEffect } from 'react';
-import { UserProfile, RiskOutput, Decisions, Scenario } from '../types';
-import { getScenario } from '../engine/scenarioEngine';
+import { useState } from 'react';
+import { UserProfile, Scenario, RiskOutput, Decisions, SafetyAction } from '../types';
+import { parseScenarioWithLLM } from '../engine/scenarioEngine';
 import { analyzeRisk } from '../engine/riskAnalyzer';
 import { simulateDecisions } from '../engine/decisionSimulator';
+import { getSafetyActions } from '../engine/safetyPaths';
 
 export function useAppState() {
   const [profile, setProfile] = useState<UserProfile>({
     visaType: 'employer',
     dependencyLevel: 'high',
-    financialPressure: 'high'
+    financialPressure: 'high',
   });
 
-  const [scenarioInput, setScenarioInput] = useState<string>('');
-  
+  const [scenarioInput, setScenarioInput] = useState('');
+
   const [resultState, setResultState] = useState<{
     scenario: Scenario | null;
     riskOutput: RiskOutput | null;
     decisions: Decisions | null;
+    safety: SafetyAction[];
   }>({
     scenario: null,
     riskOutput: null,
-    decisions: null
+    decisions: null,
+    safety: [],
   });
 
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [hasAnalyzed, setHasAnalyzed] = useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [hasAnalyzed, setHasAnalyzed] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const isProfileComplete = !!(profile?.visaType && profile?.dependencyLevel && profile?.financialPressure);
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!scenarioInput || scenarioInput.trim() === '') {
-      setErrorMsg("Please enter a scenario");
+      setErrorMsg('Please enter a scenario');
       return;
     }
-    setErrorMsg("");
+
+    setErrorMsg('');
     setIsAnalyzing(true);
     setHasAnalyzed(false);
-    
-    setTimeout(() => {
+
+    try {
+      // Step 1: LLM parses input into structured scenario
+      const structured = await parseScenarioWithLLM(scenarioInput);
+      console.log('[STATE] Structured scenario:', structured);
+
+      // Step 2: Rule engine computes risk
+      const risk = analyzeRisk(profile, structured);
+      console.log('[STATE] Risk output:', risk);
+
+      // Step 3: Rule engine simulates decisions
+      const decisions = simulateDecisions(profile, structured);
+      console.log('[STATE] Decisions:', decisions);
+
+      // Step 4: Safety layer computes actions
+      const safety = getSafetyActions(structured.type, structured.severity);
+      console.log('[STATE] Safety actions:', safety);
+
+      // Step 5: Single atomic state update
+      setResultState({
+        scenario: structured,
+        riskOutput: risk,
+        decisions: decisions,
+        safety: safety,
+      });
+    } catch (err) {
+      console.error('[STATE] Analysis pipeline failed:', err);
+      setErrorMsg('Analysis failed. Please check your API key and try again.');
+    } finally {
       setIsAnalyzing(false);
       setHasAnalyzed(true);
-    }, 1000);
-  };
-
-  useEffect(() => {
-    const safeInput = scenarioInput || "";
-    const scenario = getScenario(safeInput);
-
-    // DEBUG LOG (TEMPORARY)
-    console.log("Profile:", profile);
-    console.log("Scenario:", scenario);
-
-    if (hasAnalyzed && scenarioInput && scenarioInput.trim() !== '') {
-      const risk = analyzeRisk(profile, scenario);
-      const decisions = simulateDecisions(profile, scenario);
-
-      setResultState({
-        scenario: scenario,
-        riskOutput: risk,
-        decisions: decisions
-      });
     }
-  }, [profile, scenarioInput, hasAnalyzed]);
+  };
 
   return {
     profile,
@@ -75,6 +86,6 @@ export function useAppState() {
     errorMsg,
     setErrorMsg,
     isProfileComplete,
-    handleAnalyze
+    handleAnalyze,
   };
 }

@@ -7,6 +7,8 @@ export interface UserProfile {
 export interface Scenario {
   type: string;
   description: string;
+  severity: 'high' | 'medium' | 'low';
+  intent: string;
 }
 
 export interface RiskOutput {
@@ -27,15 +29,14 @@ export interface Decisions {
   refuse: Decision;
 }
 
-export interface AppState {
-  profile: UserProfile;
-  scenarioInput: string;
-  resultState: {
-    scenario: Scenario | null;
-    riskOutput: RiskOutput | null;
-    decisions: Decisions | null;
-  };
-  isAnalyzing: boolean;
-  hasAnalyzed: boolean;
-  errorMsg: string;
+export interface SafetyAction {
+  label: string;
+  priority: 'critical' | 'recommended' | 'optional';
+}
+
+export interface AnalysisResult {
+  scenario: Scenario;
+  riskOutput: RiskOutput;
+  decisions: Decisions;
+  safety: SafetyAction[];
 }

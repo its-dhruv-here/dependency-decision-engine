@@ -57,20 +57,44 @@ export async function callLLMForParsing(
   text: string
 ): Promise<{ type: string; severity: 'high' | 'medium' | 'low'; intent: string } | null> {
   const systemPrompt = `You are a workplace scenario classifier.
-Analyze the following employee situation and return ONLY valid JSON.
 
+Return ONLY valid JSON:
 {
-  "type": "<one of: harassment, abuse, overtime, salary_delay, workplace_pressure, unclear_instruction>",
-  "severity": "<one of: low, medium, high>",
-  "intent": "<one of: reporting_issue, asking_help, confusion, escalation>"
+  "type": "...",
+  "severity": "...",
+  "intent": "..."
 }
 
-Rules:
-- "type" must be exactly one of the listed values
-- "severity" must be exactly one of: low, medium, high
-- "intent" must be exactly one of the listed values
-- Output ONLY the JSON object, nothing else
-- No markdown, no explanation, no extra text`;
+CLASSIFICATION LOGIC (classify based on meaning, not exact words):
+
+1. If input involves threats (job loss, visa issues, punishment), coercion, or pressure:
+   → type: "workplace_pressure", severity: "high"
+
+2. If input involves unpaid work or forced overtime:
+   → type: "overtime", severity: "high"
+
+3. If input involves inappropriate behavior, harassment (verbal, physical, emotional):
+   → type: "harassment", severity: "high"
+
+4. If input involves verbal or physical abuse, passport confiscation, or violence:
+   → type: "abuse", severity: "high"
+
+5. If input involves salary delays or missing payments:
+   → type: "salary_delay", severity: "high"
+
+6. ONLY if input is truly vague or nonsensical:
+   → type: "unclear_instruction", severity: "medium"
+
+PRIORITY RULE: If multiple issues exist, choose the MOST severe one.
+Priority order: harassment > abuse > workplace_pressure > overtime > salary_delay > unclear_instruction
+
+CRITICAL: DO NOT classify serious issues as "unclear_instruction".
+
+Valid types: harassment, abuse, overtime, salary_delay, workplace_pressure, unclear_instruction
+Valid severities: low, medium, high
+Valid intents: reporting_issue, asking_help, confusion, escalation
+
+Output ONLY the JSON object. No explanation. No markdown.`;
 
   try {
     const data = await callGroq(
@@ -109,33 +133,43 @@ Rules:
 
 // ── EXPLANATION LAYER (read-only, no decisions) ─────────────────────
 export async function callLLMForExplanation(situation: string): Promise<string> {
+  // Guard: empty or too short input
+  if (!situation || situation.trim().length < 3) {
+    return 'Please describe the situation in more detail so I can explain it.';
+  }
+
   try {
     console.log('[EXPLAIN] Calling Groq with situation:', situation);
     const data = await callGroq(
       [
         {
           role: 'system',
-          content: 'You are an objective workplace analyst. Do NOT give advice. Do NOT suggest actions. Only explain what is happening objectively. Keep it under 3 sentences.',
+          content: 'You explain workplace situations clearly and objectively. Do NOT give advice or suggest actions. Only explain what is happening. Keep it under 3 sentences.',
         },
         {
           role: 'user',
-          content: `Explain this workplace situation in simple, human-friendly terms: "${situation}"`,
+          content: `Explain this workplace situation in simple terms: "${situation}"`,
         },
       ],
       { temperature: 0.2 }
     );
 
-    console.log('[EXPLAIN] API RESPONSE:', JSON.stringify(data));
-    const content = data.choices?.[0]?.message?.content;
-    return content || 'No explanation returned.';
+    console.log('[EXPLAIN] RESPONSE:', JSON.stringify(data));
+    const content = data?.choices?.[0]?.message?.content;
+    return content || 'The situation involves a workplace concern that may require careful handling based on your dependency level.';
   } catch (err) {
     console.error('[EXPLAIN] Error:', err);
-    return 'Failed to fetch explanation. Please try again.';
+    return 'This situation involves a workplace concern. Use the decision matrix above for safe next steps.';
   }
 }
 
 // ── FOLLOW-UP LAYER (read-only, no decisions) ───────────────────────
 export async function callLLMForFollowup(question: string, context: string): Promise<string> {
+  // Guard: empty or too short input
+  if (!question || question.trim().length < 3) {
+    return 'Please describe your question in a bit more detail.';
+  }
+
   try {
     console.log('[CHAT] Calling Groq with question:', question);
     const data = await callGroq(
@@ -154,11 +188,11 @@ Question: ${question}`,
       { temperature: 0.2 }
     );
 
-    console.log('[CHAT] API RESPONSE:', JSON.stringify(data));
-    const content = data.choices?.[0]?.message?.content;
-    return content || 'No response returned.';
+    console.log('[CHAT] RESPONSE:', JSON.stringify(data));
+    const content = data?.choices?.[0]?.message?.content;
+    return content || 'Sorry, I couldn\'t process that. Please try rephrasing your question.';
   } catch (err) {
     console.error('[CHAT] Error:', err);
-    return 'Failed to fetch response. Please try again.';
+    return 'Something went wrong processing your question. Please try again.';
   }
 }

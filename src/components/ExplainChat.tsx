@@ -13,26 +13,41 @@ export const ExplainChat: React.FC<Props> = ({ context }) => {
   const [isAsking, setIsAsking] = useState(false);
 
   const handleExplain = async () => {
+    if (isLoadingMain) return; // Prevent double-click
     setIsLoadingMain(true);
-    const result = await callLLMForExplanation(context);
-    setExplanation(result);
-    setIsLoadingMain(false);
+    try {
+      const result = await callLLMForExplanation(context);
+      setExplanation(result || 'This situation involves a workplace concern that may need careful handling.');
+    } catch {
+      setExplanation('This situation involves a workplace concern. Use the decision matrix above for guidance.');
+    } finally {
+      setIsLoadingMain(false);
+    }
   };
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim()) return;
+    if (!question.trim() || isAsking) return; // Prevent spam
 
-    const userQ = question;
+    if (question.trim().length < 3) {
+      setChatHistory((prev) => [...prev, { role: 'assistant', text: 'Please describe your question in more detail.' }]);
+      return;
+    }
+
+    const userQ = question.trim();
     setChatHistory((prev) => [...prev, { role: 'user', text: userQ }]);
     setQuestion('');
     setIsAsking(true);
 
-    const fullContext = `Situation: ${context}\nPrior explanation: ${explanation}`;
-    const answer = await callLLMForFollowup(userQ, fullContext);
-
-    setChatHistory((prev) => [...prev, { role: 'assistant', text: answer }]);
-    setIsAsking(false);
+    try {
+      const fullContext = `Situation: ${context}\nPrior explanation: ${explanation}`;
+      const answer = await callLLMForFollowup(userQ, fullContext);
+      setChatHistory((prev) => [...prev, { role: 'assistant', text: answer || 'Could not process that question. Please try again.' }]);
+    } catch {
+      setChatHistory((prev) => [...prev, { role: 'assistant', text: 'Something went wrong. Please try again.' }]);
+    } finally {
+      setIsAsking(false);
+    }
   };
 
   return (
@@ -42,7 +57,8 @@ export const ExplainChat: React.FC<Props> = ({ context }) => {
       {!explanation && !isLoadingMain ? (
         <button
           onClick={handleExplain}
-          className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-5 rounded-lg transition border border-slate-300 shadow-sm"
+          disabled={isLoadingMain}
+          className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-5 rounded-lg transition border border-slate-300 shadow-sm disabled:opacity-50"
         >
           Explain this situation objectively
         </button>
@@ -70,13 +86,13 @@ export const ExplainChat: React.FC<Props> = ({ context }) => {
                     }`}
                   >
                     <span className="font-bold text-[9px] block uppercase mb-1.5 tracking-wider opacity-70">
-                      {msg.role}
+                      {msg.role === 'user' ? 'You' : 'Analyst'}
                     </span>
                     <p className="leading-relaxed">{msg.text}</p>
                   </div>
                 ))}
                 {isAsking && (
-                  <div className="text-slate-400 italic text-xs animate-pulse px-2">Analyzing inquiry...</div>
+                  <div className="text-slate-400 italic text-xs animate-pulse px-2">Analyzing your question...</div>
                 )}
               </div>
             )}
@@ -95,7 +111,7 @@ export const ExplainChat: React.FC<Props> = ({ context }) => {
                 disabled={isAsking || !question.trim()}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-md font-bold disabled:opacity-50 transition-colors shadow-sm"
               >
-                Ask
+                {isAsking ? '...' : 'Ask'}
               </button>
             </form>
             <span className="text-[11px] font-medium text-slate-400 text-center block mt-1 tracking-wide uppercase">

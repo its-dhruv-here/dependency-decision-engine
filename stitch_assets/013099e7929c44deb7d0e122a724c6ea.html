@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Guides &amp; Support | Workplace Decision Simulator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#ffffff",
+              "on-background": "#1a1c1c",
+              "tertiary": "#050000",
+              "surface-container-low": "#f3f3f3",
+              "on-tertiary-fixed": "#410002",
+              "secondary-container": "#7cf994",
+              "tertiary-fixed-dim": "#ffb4ab",
+              "inverse-surface": "#2f3131",
+              "error-container": "#ffdad6",
+              "surface-tint": "#5d5c74",
+              "on-primary-fixed": "#1a1a2e",
+              "surface-container-high": "#e8e8e8",
+              "primary-fixed": "#e2e0fc",
+              "secondary": "#006e2d",
+              "surface": "#f9f9f9",
+              "on-surface": "#1a1c1c",
+              "surface-dim": "#dadada",
+              "on-primary-container": "#83829b",
+              "primary": "#00000b",
+              "surface-bright": "#f9f9f9",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#7ffc97",
+              "primary-container": "#1a1a2e",
+              "outline": "#78767d",
+              "surface-container-highest": "#e2e2e2",
+              "secondary-fixed-dim": "#62df7d",
+              "background": "#f9f9f9",
+              "on-secondary-fixed-variant": "#005320",
+              "on-secondary-container": "#007230",
+              "inverse-primary": "#c6c4df",
+              "surface-container": "#eeeeee",
+              "on-secondary-fixed": "#002109",
+              "tertiary-fixed": "#ffdad6",
+              "on-error": "#ffffff",
+              "surface-variant": "#e2e2e2",
+              "primary-fixed-dim": "#c6c4df",
+              "surface-container-lowest": "#ffffff",
+              "inverse-on-surface": "#f0f1f1",
+              "on-surface-variant": "#47464c",
+              "on-error-container": "#93000a",
+              "on-tertiary-container": "#f73b36",
+              "on-tertiary-fixed-variant": "#93000b",
+              "tertiary-container": "#420002",
+              "outline-variant": "#c8c5cd",
+              "on-tertiary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-primary-fixed-variant": "#45455b"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .hover-lift {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen antialiased">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-[0_8px_32px_rgba(26,26,46,0.06)]">
+<div class="flex justify-between items-center w-full px-8 h-20 max-w-7xl mx-auto">
+<div class="text-lg font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2 after:content-['Worker_Support'] after:text-[10px] after:uppercase after:tracking-widest after:bg-slate-100 dark:after:bg-slate-800 after:px-2 after:py-1 after:rounded-full font-['Inter'] antialiased tracking-tight">
+                Workplace Decision Simulator
+            </div>
+<div class="hidden md:flex space-x-8 items-center font-['Inter'] antialiased tracking-tight">
+<a class="text-[0.75rem] uppercase tracking-tight text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-100 transition-colors duration-200" href="#">SIMULATOR</a>
+<a class="text-[0.75rem] uppercase tracking-tight text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-100 transition-colors duration-200" href="#">HISTORY</a>
+<a class="text-[0.75rem] uppercase tracking-tight text-slate-900 dark:text-white font-bold border-b-2 border-slate-900 dark:border-white pb-1" href="#">GUIDES</a>
+<a class="text-[0.75rem] uppercase tracking-tight text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-100 transition-colors duration-200" href="#">PROFILE</a>
+</div>
+<div class="flex items-center space-x-4">
+<button class="hidden lg:block text-[0.75rem] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors duration-200 active:scale-95">Safe Decision Support</button>
+<button class="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 text-[0.75rem] font-bold uppercase tracking-widest px-6 py-2.5 rounded-full hover:shadow-lg active:scale-95 transition-all duration-200">
+                    New Case
+                </button>
+<div class="h-10 w-10 rounded-full bg-slate-200 overflow-hidden ml-2 border border-outline-variant/20">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcunrHjEoamC3reU08HHZWUUUQOw15s5DWoHMMNPi6cZ0FfogEU9EpBtNJU01cebuC1qzxHbBLv8gDk6oqKELkCS5ADKGPTqyeLV6nBYY_R6-dNSetWBjmcBTIJ2Uu0tCKBWt6tdxtIntAgRIbP88CDLddFGpkRYwg2o01HEQiAZGKoSBCA52rnTx7pCyCd4txpwPzLMBvtHQ3BZODORA_XHc8GLH21UUPs9Lhj1DxwFtPFRduK6HyWPv1bMDjxrcP-rOeEY4F6n0"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Hero Header Section -->
+<header class="mb-16">
+<span class="font-label text-xs font-semibold uppercase tracking-widest text-primary/60 mb-4 block">Knowledge Base</span>
+<h1 class="text-5xl md:text-6xl font-headline font-bold tracking-tighter text-primary mb-6">Guides &amp; Support</h1>
+<p class="text-xl text-on-surface-variant max-w-2xl leading-relaxed">
+                Empowering you with the knowledge to navigate complex workplace dynamics with confidence, legal awareness, and professional poise.
+            </p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Main Content Area -->
+<div class="lg:col-span-8 space-y-20">
+<!-- Section 1: Understanding Your Rights -->
+<section>
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-secondary text-3xl">gavel</span>
+<h2 class="text-2xl font-headline font-semibold text-primary">Understanding Your Rights</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Card 1 -->
+<div class="hover-lift bg-surface-container-lowest p-8 rounded-lg shadow-[0_8px_32px_rgba(26,26,46,0.04)] border border-outline-variant/10 flex flex-col justify-between cursor-default">
+<div>
+<h3 class="text-xl font-headline font-bold text-primary mb-4">Workplace Harassment</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">You have the right to a safe, respectful environment. Harassment includes unwelcome conduct based on protected characteristics like race, gender, or religion.</p>
+</div>
+<span class="font-label text-[10px] font-bold uppercase tracking-wider text-secondary-container bg-secondary/10 px-3 py-1 rounded-full self-start">Legal Framework</span>
+</div>
+<!-- Card 2 -->
+<div class="hover-lift bg-surface-container-lowest p-8 rounded-lg shadow-[0_8px_32px_rgba(26,26,46,0.04)] border border-outline-variant/10 flex flex-col justify-between cursor-default">
+<div>
+<h3 class="text-xl font-headline font-bold text-primary mb-4">Unpaid Overtime</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Labor laws strictly govern compensation for extra hours. If you're non-exempt and working beyond 40 hours, you are entitled to proper time-and-a-half pay.</p>
+</div>
+<span class="font-label text-[10px] font-bold uppercase tracking-wider text-secondary-container bg-secondary/10 px-3 py-1 rounded-full self-start">Compensation</span>
+</div>
+<!-- Card 3 -->
+<div class="hover-lift bg-surface-container-lowest p-8 rounded-lg shadow-[0_8px_32px_rgba(26,26,46,0.04)] border border-outline-variant/10 flex flex-col justify-between md:col-span-2 cursor-default">
+<div>
+<h3 class="text-xl font-headline font-bold text-primary mb-4">Salary Delays</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Timely payment is a contractual and legal obligation. Understanding your local labor board's rules on late payments is critical for protecting your financial stability.</p>
+</div>
+<span class="font-label text-[10px] font-bold uppercase tracking-wider text-secondary-container bg-secondary/10 px-3 py-1 rounded-full self-start">Contractual Rights</span>
+</div>
+</div>
+</section>
+<!-- Section 2: What You Can Do -->
+<section>
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl">lightbulb</span>
+<h2 class="text-2xl font-headline font-semibold text-primary">What You Can Do</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="group hover-lift bg-surface-container-high/40 hover:bg-primary p-8 rounded-lg transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined text-primary group-hover:text-white mb-6 block text-4xl transition-colors duration-200">shield</span>
+<h3 class="text-lg font-headline font-bold text-primary group-hover:text-white mb-3 transition-colors duration-200">How to respond safely</h3>
+<p class="text-on-surface-variant group-hover:text-white/80 text-xs leading-relaxed transition-colors duration-200">Prioritize your psychological safety and de-escalate whenever possible before seeking external mediation.</p>
+</div>
+<!-- Card 2 -->
+<div class="group hover-lift bg-surface-container-high/40 hover:bg-primary p-8 rounded-lg transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined text-primary group-hover:text-white mb-6 block text-4xl transition-colors duration-200">inventory_2</span>
+<h3 class="text-lg font-headline font-bold text-primary group-hover:text-white mb-3 transition-colors duration-200">How to document issues</h3>
+<p class="text-on-surface-variant group-hover:text-white/80 text-xs leading-relaxed transition-colors duration-200">Maintain a timestamped log of events, communications, and witnesses to build a solid factual foundation.</p>
+</div>
+<!-- Card 3 -->
+<div class="group hover-lift bg-surface-container-high/40 hover:bg-primary p-8 rounded-lg transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined text-primary group-hover:text-white mb-6 block text-4xl transition-colors duration-200">forum</span>
+<h3 class="text-lg font-headline font-bold text-primary group-hover:text-white mb-3 transition-colors duration-200">How to communicate professionally</h3>
+<p class="text-on-surface-variant group-hover:text-white/80 text-xs leading-relaxed transition-colors duration-200">Use "I" statements and focus on objective business impacts rather than emotional accusations.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar: Contextual Quick Tips & Support -->
+<aside class="lg:col-span-4 space-y-12">
+<!-- Quick Tips Card -->
+<div class="bg-surface-container p-10 rounded-lg sticky top-32 shadow-sm border border-outline-variant/5">
+<h3 class="text-xs font-label font-bold uppercase tracking-widest text-primary/40 mb-8">Quick Tips</h3>
+<ul class="space-y-6">
+<li class="flex items-start gap-4">
+<div class="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold">1</div>
+<span class="text-sm font-medium text-on-surface leading-snug">Keep written records of all meaningful interactions.</span>
+</li>
+<li class="flex items-start gap-4">
+<div class="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold">2</div>
+<span class="text-sm font-medium text-on-surface leading-snug">Avoid verbal-only agreements; follow up with an email.</span>
+</li>
+<li class="flex items-start gap-4">
+<div class="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold">3</div>
+<span class="text-sm font-medium text-on-surface leading-snug">Stay calm and professional even in heated moments.</span>
+</li>
+<li class="flex items-start gap-4">
+<div class="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold">4</div>
+<span class="text-sm font-medium text-on-surface leading-snug">Ask for clarity in writing whenever instructions are vague.</span>
+</li>
+</ul>
+<div class="mt-12 pt-12 border-t border-outline-variant/20">
+<div class="bg-primary p-6 rounded-lg text-white">
+<h4 class="font-headline font-bold mb-2">Need Direct Support?</h4>
+<p class="text-xs text-white/70 mb-6">Contact our human-centered support team for confidential guidance.</p>
+<button class="w-full bg-white text-primary font-bold py-3 px-6 rounded-lg hover:shadow-lg hover:-translate-y-1 transition-all duration-200 active:scale-95">
+                                Start Consultation
+                            </button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-white/95 backdrop-blur-lg border-t border-slate-100 flex justify-around items-center h-16 px-4 z-50">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-xl">play_circle</span>
+<span class="text-[10px] font-medium">Simulator</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-xl">history</span>
+<span class="text-[10px] font-medium">History</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-900" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="text-[10px] font-bold">Guides</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-xl">account_circle</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</nav>
+</body></html>

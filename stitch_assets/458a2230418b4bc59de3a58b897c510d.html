@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Workplace Decision Simulator</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ba1a1a",
+              "inverse-surface": "#2f3131",
+              "on-primary-fixed-variant": "#45455b",
+              "tertiary-fixed-dim": "#ffb4ab",
+              "primary-fixed-dim": "#c6c4df",
+              "primary": "#00000b",
+              "on-error-container": "#93000a",
+              "surface-bright": "#f9f9f9",
+              "surface-tint": "#5d5c74",
+              "surface-container-high": "#e8e8e8",
+              "on-surface": "#1a1c1c",
+              "on-primary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "inverse-on-surface": "#f0f1f1",
+              "surface-container-low": "#f3f3f3",
+              "on-secondary-fixed": "#002109",
+              "secondary-fixed-dim": "#62df7d",
+              "primary-fixed": "#e2e0fc",
+              "on-primary-fixed": "#1a1a2e",
+              "on-surface-variant": "#47464c",
+              "on-secondary": "#ffffff",
+              "on-background": "#1a1c1c",
+              "error-container": "#ffdad6",
+              "outline": "#78767d",
+              "on-tertiary-container": "#f73b36",
+              "secondary": "#006e2d",
+              "surface-container": "#eeeeee",
+              "on-error": "#ffffff",
+              "surface-variant": "#e2e2e2",
+              "secondary-container": "#7cf994",
+              "primary-container": "#1a1a2e",
+              "surface-container-highest": "#e2e2e2",
+              "surface": "#f9f9f9",
+              "secondary-fixed": "#7ffc97",
+              "tertiary": "#050000",
+              "on-secondary-fixed-variant": "#005320",
+              "on-secondary-container": "#007230",
+              "on-tertiary-fixed-variant": "#93000b",
+              "on-tertiary": "#ffffff",
+              "outline-variant": "#c8c5cd",
+              "inverse-primary": "#c6c4df",
+              "on-tertiary-fixed": "#410002",
+              "on-primary-container": "#83829b",
+              "tertiary-container": "#420002",
+              "background": "#f9f9f9",
+              "surface-dim": "#dadada",
+              "tertiary-fixed": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Inter", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { background-color: #f9f9f9; font-family: 'Inter', sans-serif; color: #1a1a2e; }
+      .glass-nav { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); }
+      .tonal-shadow { shadow-[0_8px_32px_rgba(26,26,46,0.06)]; }
+      .gradient-primary { background: linear-gradient(135deg, #00000b 0%, #1a1a2e 100%); }
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+      .perspective-lg { perspective: 1000px; }
+      .rotate-y-12 { transform: rotateY(-12deg) rotateX(5deg); }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background selection:bg-primary-fixed selection:text-on-primary-fixed font-['Inter'] antialiased tracking-tight">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-[0_8px_32px_rgba(26,26,46,0.06)]">
+<div class="flex justify-between items-center w-full px-8 h-20 max-w-full mx-auto">
+<div class="flex items-center gap-4">
+<a class="text-lg font-bold text-slate-900 flex items-center gap-2 after:content-['Worker_Support'] after:text-[10px] after:font-black after:uppercase after:tracking-widest after:bg-slate-100 after:px-2 after:py-1 after:rounded-full" href="#">
+                    Workplace Decision Simulator
+                </a>
+</div>
+<div class="hidden md:flex gap-8 items-center h-full">
+<a class="text-slate-900 font-bold border-b-2 border-slate-900 h-full flex items-center" href="#">Simulator</a>
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors h-full flex items-center" href="#">History</a>
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors h-full flex items-center" href="#">Guides</a>
+<a class="text-slate-500 font-medium hover:text-slate-900 transition-colors h-full flex items-center" href="#">Profile</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="hidden lg:block text-sm text-slate-500 font-medium">Safe Decision Support</span>
+<button class="gradient-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/10">
+                    New Case
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-32 px-8 max-w-[1440px] mx-auto pb-24">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-16 items-center mb-32">
+<div class="space-y-8">
+<h1 class="text-[3.5rem] leading-[1.1] font-bold tracking-tight text-primary">
+                    Understand your situation.<br/>Decide safely.
+                </h1>
+<p class="text-lg text-on-surface-variant max-w-[520px] leading-relaxed">
+                    This tool helps you evaluate workplace situations and choose safe actions based on your dependency and risk.
+                </p>
+<div class="flex gap-4 pt-4">
+<button class="bg-surface-container-low text-primary px-8 py-4 rounded-full font-bold hover:bg-surface-container-high transition-colors">
+                        View Sample Case
+                    </button>
+</div>
+</div>
+<div class="relative h-[450px] hidden lg:block perspective-lg">
+<!-- 3D Layered Mockup -->
+<div class="absolute top-0 right-0 w-80 h-[400px] bg-white rounded-2xl shadow-2xl rotate-y-12 z-30 overflow-hidden">
+<img class="w-full h-full object-cover opacity-90" data-alt="clean minimal UI dashboard with supportive icons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC32ukLtwmWE9xrQj54dyGUKuLkkcs9X0VkKGPbK2CNi-uOpBc0NFTaBJjTesu6gIgyCB0oBfbAg-Fn-NTTDXDidPEDoO07XLBj-rz9o6-5hm1b3jbaRdU8dyRBv3gw0ccV4M8F0Z9Qu6WGYclIRF_ts8iOWhblPt5DtxPuVfBEiUwFtd7ahPKyPscycqyXVJkIEVkVkXfk_crw5DIhKNwCrCzC2B7Ip16BJnnI83vz-_FDwKQKTcfVUmgWsa7Hzmz0388QySr_P5E"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<p class="text-[10px] uppercase font-bold tracking-widest opacity-70 mb-1">SAFE ACTION</p>
+<p class="text-xl font-bold">Ask Politely</p>
+</div>
+</div>
+<div class="absolute top-12 -left-12 w-64 h-48 bg-secondary-container/90 backdrop-blur-xl rounded-2xl shadow-xl -rotate-6 z-40 p-6 flex flex-col justify-between">
+<span class="material-symbols-outlined text-on-secondary-container text-4xl">verified_user</span>
+<div>
+<p class="text-on-secondary-container font-bold text-lg">Safest Path</p>
+<p class="text-on-secondary-container/70 text-xs">Evaluated Choice</p>
+</div>
+</div>
+<div class="absolute bottom-8 -left-4 w-72 h-40 bg-white rounded-2xl shadow-lg rotate-3 z-20 p-6">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-surface-container"></div>
+<div class="space-y-1">
+<div class="h-2 w-24 bg-surface-container rounded-full"></div>
+<div class="h-2 w-16 bg-surface-container-high rounded-full"></div>
+</div>
+</div>
+<div class="h-3 w-full bg-surface-container-low rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Main App Interface -->
+<div class="flex flex-col lg:flex-row gap-12">
+<!-- Left Sidebar: Worker Profile Summary -->
+<aside class="lg:w-[340px] space-y-10">
+<div class="sticky top-28 space-y-10">
+<!-- Worker Profile Panel -->
+<div class="bg-white p-8 rounded-3xl shadow-[0_8px_32px_rgba(26,26,46,0.04)] space-y-8 border border-surface-container">
+<div class="flex flex-col">
+<span class="text-xs font-black tracking-widest text-on-primary-container mb-4 uppercase">Worker Profile</span>
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-high overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="portrait of a professional worker" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqmSWYs95RfyeWKxSY_9YYRTch1yT8qdqSe_X6hfwX6plDaVe4AviYyOi7o0WbolmQW1d7J7vncAvRQcqjeL2gVlMrOyIW-OGZZTcIiBWz_8jT6EinuVHf08UKLga2dyD_Y1pW7JSXBROfbDTqmc9fc57wqgEINPrnECfvX20B7Cl6eS7eZnwG0aKUSmQ91OnY1HKgTBuuEeeUZzTH8cuHiPkjQUIuSh370mXfRdJjQ9Vfpc6CZj-xD8HVUEbhgbMXOlOvDgsjSKI"/>
+</div>
+<div>
+<p class="font-bold text-lg leading-tight">Current Status</p>
+<p class="text-sm text-on-surface-variant">Active Evaluation</p>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="group border-b border-outline-variant/30 pb-2">
+<label class="text-[10px] font-bold text-on-primary-container uppercase tracking-wider">Visa Type</label>
+<p class="text-sm font-semibold mt-1">Work Visa</p>
+</div>
+<div class="group border-b border-outline-variant/30 pb-2">
+<label class="text-[10px] font-bold text-on-primary-container uppercase tracking-wider">Dependency Level</label>
+<p class="text-sm font-semibold mt-1">High</p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<label class="text-[10px] font-bold text-on-primary-container uppercase tracking-wider">Dependency Impact</label>
+<span class="text-sm font-bold text-error">High Concern</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-lg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-error rounded-full" style="width: 80%"></div>
+</div>
+</div>
+</div>
+<!-- Simulator Tip Section -->
+<div class="pt-6 border-t border-outline-variant/20">
+<div class="bg-primary-fixed/30 p-5 rounded-2xl flex gap-3">
+<span class="material-symbols-outlined text-primary text-xl">lightbulb</span>
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-primary">Simulator Tip</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                                        "Keeping written records is your strongest defense." Always follow up verbal requests with an email.
+                                    </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Scenario Input (Simplified for Simulator focus) -->
+<div class="space-y-4">
+<span class="text-xs font-black tracking-widest text-on-primary-container uppercase">Describe your situation</span>
+<div class="relative">
+<textarea class="w-full p-6 rounded-2xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary/10 text-sm resize-none transition-shadow" placeholder="Example: My boss is asking me to work overtime without pay" rows="5"></textarea>
+</div>
+<button class="w-full gradient-primary text-white py-4 rounded-xl font-bold shadow-xl shadow-primary/20 hover:-translate-y-1 active:scale-95 transition-all duration-200">
+                            Analyze Situation
+                        </button>
+</div>
+</div>
+</aside>
+<!-- Right Panel -->
+<section class="flex-1 space-y-12">
+<!-- Detected Situation Card -->
+<div class="bg-white rounded-3xl p-10 shadow-[0_8px_32px_rgba(26,26,46,0.06)] relative overflow-hidden border border-surface-container">
+<div class="absolute top-0 right-0 p-8">
+<span class="bg-error text-white px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg shadow-error/20">Elevated Risk</span>
+</div>
+<div class="max-w-2xl space-y-6">
+<div class="flex items-center gap-3">
+<h3 class="text-2xl font-bold tracking-tight">Detected Situation</h3>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase">Analysis Complete</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed text-lg">
+                            Workplace pressure due to unpaid overtime. The system has identified a situation where you are being asked to exceed your agreed hours without compensation. This can lead to exhaustion and financial stress.
+                        </p>
+<!-- Risk Assessment Block -->
+<div class="pt-8 flex items-center gap-8">
+<div class="flex-1 space-y-3">
+<div class="flex justify-between items-center text-[10px] font-black text-on-primary-container uppercase">
+<span>Detailed Risk Level</span>
+<span class="text-error font-black">Elevated (65%)</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full w-[65%] bg-gradient-to-r from-secondary to-error"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant italic">This situation may affect your job security or safety depending on your dependency.</p>
+</div>
+<div class="flex gap-4">
+<div class="text-center px-4">
+<p class="text-2xl font-black text-error">High</p>
+<p class="text-[10px] font-bold text-on-primary-container uppercase">Concern</p>
+</div>
+<div class="w-px h-10 bg-outline-variant/30"></div>
+<div class="text-center px-4">
+<p class="text-2xl font-black text-primary">Strong</p>
+<p class="text-[10px] font-bold text-on-primary-container uppercase">Security</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Decision Matrix -->
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-black tracking-[0.2em] text-on-primary-container uppercase">Available Actions</h4>
+<button class="text-[10px] font-bold text-primary flex items-center gap-2">
+                            VIEW DETAILS <span class="material-symbols-outlined text-sm">info</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card: Accept -->
+<div class="group bg-white p-8 rounded-3xl shadow-[0_8px_32px_rgba(26,26,46,0.04)] hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(26,26,46,0.1)] transition-all duration-200 cursor-pointer border border-transparent">
+<div class="flex justify-between items-start mb-8">
+<div class="w-12 h-12 bg-surface-container rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-[9px] font-bold">LOW FRICTION</span>
+</div>
+<h5 class="text-lg font-bold mb-3">Accept for now</h5>
+<p class="text-sm text-on-surface-variant leading-relaxed">Accepting may reduce immediate conflict, but could increase long-term pressure.</p>
+</div>
+<!-- Card: Ask Politely (Recommended) -->
+<div class="group bg-white p-8 rounded-3xl shadow-[0_16px_48px_rgba(26,26,46,0.12)] border-2 border-secondary ring-4 ring-secondary/5 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,110,45,0.15)] transition-all duration-200 cursor-pointer relative">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-white px-4 py-1 rounded-full text-[10px] font-black tracking-widest uppercase shadow-md">Recommended</div>
+<div class="flex justify-between items-start mb-8">
+<div class="w-12 h-12 bg-secondary text-white rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat</span>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[9px] font-bold">BALANCED PATH</span>
+</div>
+<h5 class="text-lg font-bold mb-3">Ask Politely</h5>
+<p class="text-sm text-on-surface-variant leading-relaxed">You can raise the issue carefully and create a record of communication.</p>
+</div>
+<!-- Card: Refuse -->
+<div class="group bg-white p-8 rounded-3xl shadow-[0_8px_32px_rgba(26,26,46,0.04)] hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(26,26,46,0.1)] transition-all duration-200 cursor-pointer border border-transparent">
+<div class="flex justify-between items-start mb-8">
+<div class="w-12 h-12 bg-surface-container rounded-2xl flex items-center justify-center text-primary group-hover:bg-error group-hover:text-white transition-colors duration-200">
+<span class="material-symbols-outlined">block</span>
+</div>
+<span class="bg-error-container text-on-error-container px-4 py-1 rounded-full text-[9px] font-black uppercase">High Risk</span>
+</div>
+<h5 class="text-lg font-bold mb-3">Refuse</h5>
+<p class="text-sm text-on-surface-variant leading-relaxed">Refusing may protect you, but could carry risks depending on your situation.</p>
+</div>
+</div>
+</div>
+<!-- Safe Next Steps -->
+<div class="bg-surface-container-low rounded-3xl p-10 flex flex-col md:flex-row gap-12 items-start border border-surface-container">
+<div class="space-y-4 max-w-sm">
+<h4 class="text-xl font-bold">Safe Next Steps</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Practical actions to help you manage this situation safely.</p>
+<p class="text-xs text-error font-bold">Because your dependency is high, some actions may carry more risk.</p>
+</div>
+<div class="flex-1 space-y-4 w-full">
+<div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-surface-container shadow-sm hover:translate-x-1 transition-transform">
+<span class="w-8 h-8 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">01</span>
+<p class="text-sm font-medium">Keep written records of conversations</p>
+</div>
+<div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-surface-container shadow-sm hover:translate-x-1 transition-transform">
+<span class="w-8 h-8 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">02</span>
+<p class="text-sm font-medium">Avoid verbal-only agreements</p>
+</div>
+<div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-surface-container shadow-sm hover:translate-x-1 transition-transform">
+<span class="w-8 h-8 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">03</span>
+<p class="text-sm font-medium">Reach out to someone you trust</p>
+</div>
+<div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-surface-container shadow-sm hover:translate-x-1 transition-transform">
+<span class="w-8 h-8 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">04</span>
+<p class="text-sm font-medium">Document incidents with date and time</p>
+</div>
+</div>
+</div>
+<!-- Expandable Explanation Panel -->
+<div class="border-t border-outline-variant/30 pt-10">
+<details class="group">
+<summary class="list-none flex justify-between items-center cursor-pointer">
+<h4 class="text-xs font-black tracking-[0.2em] text-on-primary-container uppercase">Understand this situation</h4>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-12 animate-in fade-in slide-in-from-top-4 duration-500">
+<div class="space-y-4">
+<h6 class="font-bold">What is happening?</h6>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                                    This section explains why this situation is risky and what it could lead to. In this case, unpaid overtime is often a sign of increasing pressure that may violate your basic workplace rights.
+                                </p>
+</div>
+<div class="space-y-4">
+<h6 class="font-bold">How dependency affects you</h6>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                                    When your dependency on a job is high (like when you have a specific visa or financial needs), your options may feel limited. We suggest paths that minimize direct conflict while still protecting your interests.
+                                </p>
+</div>
+</div>
+</details>
+</div>
+</section>
+</div>
+</main>
+</body></html>

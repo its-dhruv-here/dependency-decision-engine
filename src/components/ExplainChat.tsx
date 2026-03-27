@@ -13,13 +13,13 @@ export const ExplainChat: React.FC<Props> = ({ context }) => {
   const [isAsking, setIsAsking] = useState(false);
 
   const handleExplain = async () => {
-    if (isLoadingMain) return; // Prevent double-click
+    if (isLoadingMain) return;
     setIsLoadingMain(true);
     try {
       const result = await callLLMForExplanation(context);
       setExplanation(result || 'This situation involves a workplace concern that may need careful handling.');
     } catch {
-      setExplanation('This situation involves a workplace concern. Use the decision matrix above for guidance.');
+      setExplanation('This situation involves a workplace concern. Use the decision options above for guidance.');
     } finally {
       setIsLoadingMain(false);
     }
@@ -27,96 +27,115 @@ export const ExplainChat: React.FC<Props> = ({ context }) => {
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim() || isAsking) return; // Prevent spam
-
+    if (!question.trim() || isAsking) return;
     if (question.trim().length < 3) {
-      setChatHistory((prev) => [...prev, { role: 'assistant', text: 'Please describe your question in more detail.' }]);
+      setChatHistory(prev => [...prev, { role: 'assistant', text: 'Please describe your question in more detail.' }]);
       return;
     }
 
     const userQ = question.trim();
-    setChatHistory((prev) => [...prev, { role: 'user', text: userQ }]);
+    setChatHistory(prev => [...prev, { role: 'user', text: userQ }]);
     setQuestion('');
     setIsAsking(true);
 
     try {
-      const fullContext = `Situation: ${context}\nPrior explanation: ${explanation}`;
-      const answer = await callLLMForFollowup(userQ, fullContext);
-      setChatHistory((prev) => [...prev, { role: 'assistant', text: answer || 'Could not process that question. Please try again.' }]);
+      const answer = await callLLMForFollowup(userQ, `Situation: ${context}\nExplanation: ${explanation}`);
+      setChatHistory(prev => [...prev, { role: 'assistant', text: answer || 'Could not process that. Please try again.' }]);
     } catch {
-      setChatHistory((prev) => [...prev, { role: 'assistant', text: 'Something went wrong. Please try again.' }]);
+      setChatHistory(prev => [...prev, { role: 'assistant', text: 'Something went wrong. Please try again.' }]);
     } finally {
       setIsAsking(false);
     }
   };
 
   return (
-    <div className="mt-8 border-t border-slate-200 pt-6">
-      <h3 className="text-lg font-bold text-slate-800 mb-4">5. Situation Explanation (Optional)</h3>
+    <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '24px' }}>
+      <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#111827', marginBottom: '14px' }}>Situation Explanation</h3>
 
       {!explanation && !isLoadingMain ? (
         <button
           onClick={handleExplain}
           disabled={isLoadingMain}
-          className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-5 rounded-lg transition border border-slate-300 shadow-sm disabled:opacity-50"
+          style={{
+            background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px',
+            padding: '8px 16px', fontSize: '12px', fontWeight: 600, color: '#374151',
+            cursor: 'pointer', boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03)',
+          }}
         >
           Explain this situation objectively
         </button>
       ) : isLoadingMain ? (
-        <div className="animate-pulse text-slate-500 font-medium text-sm">Generating objective breakdown...</div>
+        <div className="animate-pulse" style={{ fontSize: '12px', color: '#9ca3af', fontWeight: 500, padding: '8px 0' }}>
+          Generating objective analysis...
+        </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-lg text-slate-800 text-sm leading-relaxed shadow-inner">
-            <strong className="block text-blue-800 mb-2 uppercase tracking-wide text-xs">Objective Analysis</strong>
-            {explanation}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Explanation Box */}
+          <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: '10px', padding: '14px 16px' }}>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '6px' }}>
+              Objective Analysis
+            </span>
+            <p style={{ fontSize: '13px', color: '#1f2937', lineHeight: '1.7', fontWeight: 500 }}>{explanation}</p>
           </div>
 
-          <div className="bg-white border text-sm border-slate-200 p-5 rounded-lg flex flex-col gap-4 shadow-sm">
-            <h4 className="font-bold text-slate-800 text-base">Ask a follow-up question</h4>
+          {/* Follow-up Chat */}
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 16px', background: '#ffffff' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '10px' }}>Ask a follow-up</h4>
 
             {(chatHistory.length > 0 || isAsking) && (
-              <div className="flex flex-col gap-3 max-h-60 overflow-y-auto p-2">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto', marginBottom: '10px', padding: '4px' }}>
                 {chatHistory.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`px-4 py-3 rounded-xl max-w-[90%] ${
-                      msg.role === 'user'
-                        ? 'bg-blue-600 text-white self-end ml-auto'
-                        : 'bg-slate-50 self-start mr-auto border border-slate-200 text-slate-800'
-                    }`}
-                  >
-                    <span className="font-bold text-[9px] block uppercase mb-1.5 tracking-wider opacity-70">
+                  <div key={i} style={{
+                    padding: '8px 12px', borderRadius: '10px', maxWidth: '85%', fontSize: '12px', lineHeight: '1.6', fontWeight: 500,
+                    ...(msg.role === 'user'
+                      ? { background: '#2563eb', color: '#ffffff', alignSelf: 'flex-end', marginLeft: 'auto' }
+                      : { background: '#f3f4f6', color: '#374151', alignSelf: 'flex-start', border: '1px solid #e5e7eb' }
+                    ),
+                  }}>
+                    <span style={{ fontSize: '9px', fontWeight: 700, display: 'block', marginBottom: '4px', opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
                       {msg.role === 'user' ? 'You' : 'Analyst'}
                     </span>
-                    <p className="leading-relaxed">{msg.text}</p>
+                    {msg.text}
                   </div>
                 ))}
                 {isAsking && (
-                  <div className="text-slate-400 italic text-xs animate-pulse px-2">Analyzing your question...</div>
+                  <div className="animate-pulse" style={{ fontSize: '11px', color: '#9ca3af', fontStyle: 'italic', padding: '4px' }}>
+                    Thinking...
+                  </div>
                 )}
               </div>
             )}
 
-            <form onSubmit={handleAsk} className="flex gap-2 mt-1">
+            <form onSubmit={handleAsk} style={{ display: 'flex', gap: '8px' }}>
               <input
                 type="text"
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={e => setQuestion(e.target.value)}
                 placeholder="E.g., What are the legal risks here?"
-                className="flex-1 border border-slate-300 rounded-md px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-800 placeholder-slate-400"
                 disabled={isAsking}
+                style={{
+                  flex: 1, border: '1px solid #e5e7eb', borderRadius: '8px',
+                  padding: '8px 12px', fontSize: '12px', fontWeight: 500,
+                  color: '#374151', background: '#f9fafb',
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                }}
               />
               <button
                 type="submit"
                 disabled={isAsking || !question.trim()}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-md font-bold disabled:opacity-50 transition-colors shadow-sm"
+                style={{
+                  background: '#2563eb', color: '#ffffff', border: 'none',
+                  borderRadius: '8px', padding: '8px 16px', fontSize: '12px',
+                  fontWeight: 700, cursor: isAsking || !question.trim() ? 'not-allowed' : 'pointer',
+                  opacity: isAsking || !question.trim() ? 0.5 : 1,
+                }}
               >
                 {isAsking ? '...' : 'Ask'}
               </button>
             </form>
-            <span className="text-[11px] font-medium text-slate-400 text-center block mt-1 tracking-wide uppercase">
-              LLM provides explanations only — decisions are made by the rule engine.
-            </span>
+            <p style={{ fontSize: '10px', color: '#9ca3af', textAlign: 'center', marginTop: '8px', fontWeight: 500 }}>
+              Explanations only — decisions are made by the rule engine.
+            </p>
           </div>
         </div>
       )}

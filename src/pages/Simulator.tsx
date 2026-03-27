@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { ProfileForm } from '../components/ProfileForm';
 import { ScenarioInput } from '../components/ScenarioInput';
 import { DecisionMatrix } from '../components/DecisionMatrix';
@@ -6,25 +8,59 @@ import { useAppContext } from '../state/AppContext';
 
 export const Simulator: React.FC = () => {
   const state = useAppContext();
+  
+  const heroRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    // 1. HERO / INPUT SECTION: Fade in + slight upward motion on page load
+    gsap.from('.hero-element', {
+      y: 40,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      delay: 0.1
+    });
+
+    gsap.from('.hero-mockup', {
+      x: 40,
+      opacity: 0,
+      rotateY: -20,
+      duration: 1,
+      ease: 'power3.out',
+      delay: 0.4
+    });
+  }, { scope: heroRef });
+
+  const handleSampleCase = () => {
+    state.setScenarioInput("My employer is asking me to work overtime without pay and threatening to fire me if I refuse.");
+    state.setInputSourceType('text');
+    
+    setTimeout(() => {
+      document.getElementById('scenario-input-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
 
   return (
     <main className="pt-32 px-8 max-w-[1440px] mx-auto pb-24">
       {/* Hero Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-16 items-center mb-16">
+      <section ref={heroRef} className="grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-16 items-center mb-16">
         <div className="space-y-8">
-          <h1 className="text-[3.5rem] leading-[1.1] font-bold tracking-tight text-primary">
+          <h1 className="hero-element text-[3.5rem] leading-[1.1] font-bold tracking-tight text-primary">
             Understand your situation.<br />Decide safely.
           </h1>
-          <p className="text-lg text-on-surface-variant max-w-[520px] leading-relaxed">
+          <p className="hero-element text-lg text-on-surface-variant max-w-[520px] leading-relaxed">
             This tool helps you evaluate workplace situations and choose safe actions based on your dependency and risk.
           </p>
-          <div className="flex gap-4 pt-4">
-            <button className="bg-surface-container-low text-primary px-8 py-4 rounded-full font-bold hover:bg-surface-container-high transition-colors">
+          <div className="hero-element flex gap-4 pt-4">
+            <button 
+              onClick={handleSampleCase}
+              className="bg-surface-container-low text-primary px-8 py-4 rounded-full font-bold hover:bg-surface-container-high transition-colors hover:shadow-sm active:scale-[0.98]">
               View Sample Case
             </button>
           </div>
         </div>
-        <div className="relative h-[450px] hidden lg:block perspective-lg">
+        <div className="hero-mockup relative h-[450px] hidden lg:block perspective-lg">
           {/* 3D Layered Mockup */}
           <div className="absolute top-0 right-0 w-80 h-[400px] bg-white rounded-2xl shadow-2xl rotate-y-12 z-30 overflow-hidden">
             <img className="w-full h-full object-cover opacity-90" alt="clean minimal UI dashboard with supportive icons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC32ukLtwmWE9xrQj54dyGUKuLkkcs9X0VkKGPbK2CNi-uOpBc0NFTaBJjTesu6gIgyCB0oBfbAg-Fn-NTTDXDidPEDoO07XLBj-rz9o6-5hm1b3jbaRdU8dyRBv3gw0ccV4M8F0Z9Qu6WGYclIRF_ts8iOWhblPt5DtxPuVfBEiUwFtd7ahPKyPscycqyXVJkIEVkVkXfk_crw5DIhKNwCrCzC2B7Ip16BJnnI83vz-_FDwKQKTcfVUmgWsa7Hzmz0388QySr_P5E" />
@@ -55,7 +91,7 @@ export const Simulator: React.FC = () => {
       </section>
 
       {/* Main App Interface */}
-      <div className="flex flex-col lg:flex-row items-start gap-12">
+      <div id="scenario-input-section" className="flex flex-col lg:flex-row items-start gap-12">
         {/* Left Sidebar */}
         <aside className="w-full lg:w-[340px] flex-shrink-0 space-y-8 h-auto">
           <ProfileForm />
@@ -103,15 +139,7 @@ export const Simulator: React.FC = () => {
               <span className="material-symbols-outlined text-secondary">edit_note</span>
               What's happening?
             </h2>
-            <ScenarioInput
-              scenarioInput={state.scenarioInput}
-              setScenarioInput={state.setScenarioInput}
-              errorMsg={state.errorMsg}
-              setErrorMsg={state.setErrorMsg}
-              isAnalyzing={state.isAnalyzing}
-              isProfileComplete={state.isProfileComplete}
-              handleAnalyze={state.handleAnalyze}
-            />
+            <ScenarioInput />
           </div>
 
           {/* Results Area */}

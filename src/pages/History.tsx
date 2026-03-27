@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { useAppContext, HistoryItem } from '../state/AppContext';
 
 export const History: React.FC = () => {
@@ -37,10 +39,32 @@ export const History: React.FC = () => {
 
   const highRiskAvoided = history.filter(h => h.resultState.riskOutput?.riskLevel === 'high').length;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    // Reveal sidebar
+    gsap.fromTo('.history-sidebar', 
+      { x: -40, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
+    );
+    
+    // Reveal header elements
+    gsap.fromTo('.history-header', 
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power3.out' }
+    );
+
+    // Reveal history cards
+    gsap.fromTo('.history-card', 
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: 'power3.out', delay: 0.2 }
+    );
+  }, { scope: containerRef, dependencies: [] });
+
   return (
-    <div className="flex pt-20 min-h-screen">
+    <div ref={containerRef} className="flex pt-20 min-h-screen">
       {/* Contextual Sidebar: Insights & Analytics */}
-      <aside className="hidden lg:flex flex-col p-8 space-y-6 h-[calc(100vh-5rem)] w-72 border-r border-slate-100 bg-slate-50/50 fixed left-0">
+      <aside className="history-sidebar hidden lg:flex flex-col p-8 space-y-6 h-[calc(100vh-5rem)] w-72 border-r border-slate-100 bg-slate-50/50 fixed left-0">
         <div>
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Insight Status</h2>
           <div className="space-y-8">
@@ -89,7 +113,7 @@ export const History: React.FC = () => {
 
       {/* Main Content Canvas */}
       <main className="flex-1 lg:ml-72 p-8 md:p-12 lg:p-16">
-        <header className="max-w-5xl mx-auto mb-16">
+        <header className="history-header max-w-5xl mx-auto mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="space-y-4">
               <span className="font-['Inter'] font-semibold text-[0.75rem] uppercase tracking-[0.2em] text-secondary">Chronicle</span>
@@ -99,7 +123,7 @@ export const History: React.FC = () => {
           </div>
         </header>
 
-        <section className="max-w-5xl mx-auto mb-12">
+        <section className="history-header max-w-5xl mx-auto mb-12">
           <div className="bg-surface-container-low p-2 rounded-2xl flex flex-col md:flex-row gap-2 transition-all duration-300">
             <div className="relative flex-grow">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
@@ -150,7 +174,7 @@ export const History: React.FC = () => {
                     loadHistoryItem(item);
                     navigate('/');
                   }}
-                  className={`group card-hover bg-white hover:shadow-[0_20px_40px_rgba(26,26,46,0.1)] rounded-lg p-10 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden border-l-[4px] cursor-pointer transition-all duration-300 ${colorClass}`}
+                  className={`history-card group card-hover bg-white hover:shadow-[0_20px_40px_rgba(26,26,46,0.1)] rounded-lg p-10 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden border-l-[4px] cursor-pointer transition-all duration-300 ${colorClass}`}
                 >
                   <div className="flex-grow space-y-6 w-full">
                     <div className="flex flex-wrap items-center gap-4">
@@ -163,11 +187,21 @@ export const History: React.FC = () => {
                     </div>
                     <h3 className="text-2xl font-semibold text-primary capitalize">{title}</h3>
                     <p className="text-on-primary-container text-lg leading-relaxed line-clamp-3">"{item.scenarioInput}"</p>
-                    <div className="flex items-center gap-2 text-slate-500 pt-4">
-                      <span className="material-symbols-outlined text-[18px]">category</span>
-                      <span className="text-xs font-bold uppercase tracking-widest">{item.resultState.scenario?.type?.replace(/_/g, ' ')}</span>
+                      <div className="flex items-center gap-2 text-slate-500 pt-4">
+                        <span className="material-symbols-outlined text-[18px]">category</span>
+                        <span className="text-xs font-bold uppercase tracking-widest">{item.resultState.scenario?.type?.replace(/_/g, ' ')}</span>
+                      </div>
+                      {item.resultState.scenario?.sourceType && item.resultState.scenario.sourceType !== 'text' && (
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-lg max-w-fit">
+                          <span className="material-symbols-outlined text-xs text-primary">
+                            {item.resultState.scenario.sourceType === 'pdf' ? 'picture_as_pdf' : 'image'}
+                          </span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                            {item.resultState.scenario.sourceType} Upload
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  </div>
                   <div className="flex flex-shrink-0">
                     <button className="p-4 rounded-xl border border-slate-100 text-primary hover:bg-slate-50 transition-all duration-300 shadow-sm group-hover:shadow group-hover:bg-slate-50">
                       <span className="material-symbols-outlined">rocket_launch</span>

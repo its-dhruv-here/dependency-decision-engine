@@ -24,6 +24,8 @@ interface AppContextType {
   resetProfile: () => void;
   scenarioInput: string;
   setScenarioInput: (v: string) => void;
+  inputSourceType: 'text' | 'pdf' | 'image';
+  setInputSourceType: (type: 'text' | 'pdf' | 'image') => void;
   resultState: HistoryItem['resultState'];
   isAnalyzing: boolean;
   hasAnalyzed: boolean;
@@ -65,6 +67,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [scenarioInput, setScenarioInput] = useState('');
+  const [inputSourceType, setInputSourceType] = useState<'text' | 'pdf' | 'image'>('text');
+  
   const [resultState, setResultState] = useState<HistoryItem['resultState']>({
     scenario: null,
     riskOutput: null,
@@ -133,6 +137,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const structured = await parseScenarioWithLLM(scenarioInput);
       if (!structured) throw new Error('Failed to parse scenario');
       
+      structured.sourceType = inputSourceType;
+
       const risk = analyzeRisk(profile, structured);
       const decisions = simulateDecisions(profile, structured);
       const safety = getSafetyActions(structured.type, structured.severity);
@@ -167,6 +173,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const resetNewCase = () => {
     setScenarioInput('');
+    setInputSourceType('text');
     setResultState({ scenario: null, riskOutput: null, decisions: null, safety: [] });
     setHasAnalyzed(false);
     setErrorMsg('');
@@ -190,6 +197,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         resetProfile,
         scenarioInput,
         setScenarioInput,
+        inputSourceType,
+        setInputSourceType,
         resultState,
         isAnalyzing,
         hasAnalyzed,

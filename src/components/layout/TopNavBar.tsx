@@ -1,19 +1,60 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../state/AppContext';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const TopNavBar: React.FC = () => {
   const { resetNewCase } = useAppContext();
   const navigate = useNavigate();
+  const navRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleNewCase = () => {
     resetNewCase();
     navigate('/');
   };
 
+  useGSAP(() => {
+    ScrollTrigger.create({
+      start: "top -80",
+      end: 99999,
+      onToggle: (self) => {
+        if (self.isActive) {
+          gsap.to(navRef.current, { 
+            backgroundColor: "rgba(255,255,255,0.9)", 
+            boxShadow: "0 10px 40px rgba(26,26,46,0.1)",
+            duration: 0.4, 
+            ease: "power2.out" 
+          });
+          gsap.to(containerRef.current, { 
+            height: "4rem", 
+            duration: 0.4, 
+            ease: "power2.out" 
+          });
+        } else {
+          gsap.to(navRef.current, { 
+            backgroundColor: "rgba(255,255,255,0.7)", 
+            boxShadow: "0 8px 32px rgba(26,26,46,0.06)",
+            duration: 0.4, 
+            ease: "power2.out" 
+          });
+          gsap.to(containerRef.current, { 
+            height: "5rem", 
+            duration: 0.4, 
+            ease: "power2.out" 
+          });
+        }
+      }
+    });
+  });
+
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-[0_8px_32px_rgba(26,26,46,0.06)] font-['Inter'] antialiased tracking-tight transition-all duration-300">
-      <div className="flex justify-between items-center w-full px-8 h-20 max-w-full mx-auto">
+    <nav ref={navRef} className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-lg shadow-[0_8px_32px_rgba(26,26,46,0.06)] font-['Inter'] antialiased tracking-tight">
+      <div ref={containerRef} className="flex justify-between items-center w-full px-8 h-20 max-w-full mx-auto">
         <div className="flex items-center gap-4">
           <NavLink to="/" className="text-lg font-bold text-slate-900 flex items-center gap-2 after:content-['Worker_Support'] after:text-[10px] after:font-black after:uppercase after:tracking-widest after:bg-slate-100 after:px-2 after:py-1 after:rounded-full">
               Workplace Decision Simulator

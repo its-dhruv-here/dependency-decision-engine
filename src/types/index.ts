@@ -9,6 +9,7 @@ export interface Scenario {
   description: string;
   severity: 'high' | 'medium' | 'low';
   intent: string;
+  sourceType?: 'text' | 'pdf' | 'image';
 }
 
 export interface RiskOutput {

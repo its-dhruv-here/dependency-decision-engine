@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const Guides: React.FC = () => {
+  const containerRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    // 4. SCROLL ANIMATIONS (GUIDES PAGE)
+    const elements = gsap.utils.toArray('.guide-reveal');
+    
+    elements.forEach((el: any) => {
+      gsap.from(el, {
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.out'
+      });
+    });
+  }, { scope: containerRef });
+
   return (
-    <main className="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto min-h-screen">
-      <header className="mb-16">
+    <main ref={containerRef} className="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto min-h-screen">
+      <header className="guide-reveal mb-16">
         <span className="font-['Inter'] text-xs font-semibold uppercase tracking-widest text-primary/60 mb-4 block">Knowledge Base</span>
         <h1 className="text-5xl md:text-6xl font-['Inter'] font-bold tracking-tighter text-primary mb-6">Guides & Support</h1>
         <p className="text-xl text-on-surface-variant max-w-2xl leading-relaxed">
@@ -16,7 +42,7 @@ export const Guides: React.FC = () => {
         <div className="lg:col-span-8 space-y-20">
           
           {/* Section 1: Understanding Your Rights */}
-          <section>
+          <section className="guide-reveal">
             <div className="flex items-center gap-4 mb-8">
               <span className="material-symbols-outlined text-secondary text-3xl">gavel</span>
               <h2 className="text-2xl font-['Inter'] font-semibold text-primary">Understanding Your Rights</h2>
@@ -49,7 +75,7 @@ export const Guides: React.FC = () => {
           </section>
 
           {/* Section 2: What You Can Do */}
-          <section>
+          <section className="guide-reveal">
             <div className="flex items-center gap-4 mb-8">
               <span className="material-symbols-outlined text-primary text-3xl">lightbulb</span>
               <h2 className="text-2xl font-['Inter'] font-semibold text-primary">What You Can Do</h2>
@@ -77,7 +103,7 @@ export const Guides: React.FC = () => {
         </div>
 
         {/* Sidebar: Contextual Quick Tips & Support */}
-        <aside className="lg:col-span-4 space-y-12">
+        <aside className="lg:col-span-4 space-y-12 guide-reveal">
           <div className="bg-white p-10 rounded-3xl sticky top-32 shadow-[0_8px_32px_rgba(26,26,46,0.04)] border border-surface-container">
             <h3 className="text-xs font-['Inter'] font-bold uppercase tracking-widest text-primary/40 mb-8">Quick Tips</h3>
             <ul className="space-y-6">

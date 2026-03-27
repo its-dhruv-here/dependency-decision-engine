@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { UserProfile, RiskOutput, Decisions, Scenario, SafetyAction } from '../types';
 import { ExplainChat } from './ExplainChat';
 
@@ -16,6 +18,37 @@ interface Props {
 
 export const DecisionMatrix: React.FC<Props> = ({ hasAnalyzed, isAnalyzing, resultState }) => {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const matrixRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (resultState.scenario) {
+      // Stagger the Detected Situation block first
+      gsap.from('.stagger-intro', {
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.out'
+      });
+      // Then stagger the decision cards
+      gsap.from('.stagger-card', {
+        y: 40,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: 'power3.out',
+        delay: 0.2
+      });
+      // Then Safe Steps and Chat
+      gsap.from('.stagger-post', {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'power3.out',
+        delay: 0.4
+      });
+    }
+  }, { scope: matrixRef, dependencies: [resultState.scenario] });
 
   if (!hasAnalyzed && !isAnalyzing) {
     return (
@@ -52,9 +85,9 @@ export const DecisionMatrix: React.FC<Props> = ({ hasAnalyzed, isAnalyzing, resu
   const riskPercent = isHighRisk ? '85%' : riskOutput.riskLevel === 'medium' ? '65%' : '20%';
 
   return (
-    <div className="animate-fade-in-up space-y-12">
+    <div ref={matrixRef} className="space-y-12">
       {/* 1. Detected Situation Card */}
-      <div className="bg-white rounded-3xl p-10 shadow-[0_8px_32px_rgba(26,26,46,0.06)] relative overflow-hidden border border-surface-container">
+      <div className="stagger-intro bg-white rounded-3xl p-10 shadow-[0_8px_32px_rgba(26,26,46,0.06)] relative overflow-hidden border border-surface-container">
         <div className="absolute top-0 right-0 p-8">
           <span className={`${isHighRisk ? 'bg-error' : 'bg-primary'} text-white px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg ${isHighRisk ? 'shadow-error/20' : 'shadow-primary/20'}`}>
             {riskOutput.riskLevel} Risk
@@ -92,7 +125,7 @@ export const DecisionMatrix: React.FC<Props> = ({ hasAnalyzed, isAnalyzing, resu
 
       {/* 2. Decision Matrix */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="stagger-intro flex items-center justify-between">
           <h4 className="text-xs font-black tracking-[0.2em] text-on-primary-container uppercase">Available Actions</h4>
           <button className="text-[10px] font-bold text-primary flex items-center gap-2 hover:-translate-y-0.5 active:scale-95 transition-all">
             VIEW DETAILS <span className="material-symbols-outlined text-sm">info</span>
@@ -104,7 +137,7 @@ export const DecisionMatrix: React.FC<Props> = ({ hasAnalyzed, isAnalyzing, resu
             if (!dec) return null;
             const isExpanded = expandedCard === type;
 
-            const baseCardClass = "group bg-white p-8 rounded-3xl transition-all duration-200 cursor-pointer relative";
+            const baseCardClass = "stagger-card group bg-white p-8 rounded-3xl transition-all duration-200 cursor-pointer relative";
             const iconMap = { accept: 'check_circle', ask: 'chat', refuse: 'block' };
             const titleMap = { accept: 'Accept for now', ask: 'Ask Politely', refuse: 'Refuse' };
             
@@ -151,7 +184,7 @@ export const DecisionMatrix: React.FC<Props> = ({ hasAnalyzed, isAnalyzing, resu
                 </p>
 
                 {isExpanded && (
-                  <div className="animate-fade-in-up mt-6 pt-6 border-t border-outline-variant/20 space-y-4">
+                  <div className="animate-fade-in-up mt-6 pt-6 border-t border-outline-variant/20 space-y-4 cursor-default" onClick={e => e.stopPropagation()}>
                     <div className="bg-surface-container-low p-4 rounded-xl">
                       <span className="text-[9px] font-black text-on-primary-container tracking-widest uppercase mb-1 block">Suggested Reply</span>
                       <p className="text-sm font-medium italic text-primary">"{dec.reply}"</p>
@@ -170,7 +203,7 @@ export const DecisionMatrix: React.FC<Props> = ({ hasAnalyzed, isAnalyzing, resu
 
       {/* 3. Safe Next Steps */}
       {safety && safety.length > 0 && (
-        <div className="bg-surface-container-low rounded-3xl p-10 flex flex-col md:flex-row gap-12 items-start border border-surface-container">
+        <div className="stagger-post bg-surface-container-low rounded-3xl p-10 flex flex-col md:flex-row gap-12 items-start border border-surface-container">
           <div className="space-y-4 max-w-sm">
             <h4 className="text-xl font-bold">Safe Next Steps</h4>
             <p className="text-sm text-on-surface-variant leading-relaxed">Practical actions to help you manage this situation safely.</p>
@@ -192,7 +225,7 @@ export const DecisionMatrix: React.FC<Props> = ({ hasAnalyzed, isAnalyzing, resu
       )}
 
       {/* 4. Explanation Section via existing ExplainChat */}
-      <div className="border-t border-outline-variant/30 pt-10 pb-8">
+      <div className="stagger-post border-t border-outline-variant/30 pt-10 pb-8">
         <h4 className="text-xs font-black tracking-[0.2em] text-on-primary-container uppercase mb-8">Understand this situation dynamically</h4>
         <ExplainChat context={scenario.description} />
       </div>

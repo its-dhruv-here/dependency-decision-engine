@@ -48,7 +48,7 @@ const ConfirmDialog: React.FC<{
 };
 
 export const History: React.FC = () => {
-  const { history, loadHistoryItem, deleteHistoryItem, clearHistory, weeklyAccuracy } = useAppContext();
+  const { history, loadHistoryItem, deleteHistoryItem, clearHistory } = useAppContext();
   const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
@@ -178,26 +178,7 @@ export const History: React.FC = () => {
         <div>
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Insight Status</h2>
           <div className="space-y-8">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-md">
-              <p className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Weekly Accuracy</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-black text-primary">{weeklyAccuracy !== null ? `${weeklyAccuracy}%` : '--'}</span>
-                {weeklyAccuracy !== null && weeklyAccuracy >= 50 ? (
-                  <span className="text-secondary text-xs font-bold flex items-center">
-                    <span className="material-symbols-outlined text-sm">trending_up</span>
-                    safe
-                  </span>
-                ) : weeklyAccuracy !== null ? (
-                  <span className="text-error text-xs font-bold flex items-center">
-                    <span className="material-symbols-outlined text-sm">trending_down</span>
-                    risky
-                  </span>
-                ) : null}
-              </div>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
-                <div className="bg-secondary h-full rounded-full transition-all duration-700 ease-out" style={{ width: weeklyAccuracy !== null ? `${weeklyAccuracy}%` : '0%' }}></div>
-              </div>
-            </div>
+
             <div className="space-y-4 px-2">
               <div className="flex gap-4 items-start">
                 <div className="p-2 rounded-lg bg-secondary-container/30 text-secondary">

@@ -107,29 +107,7 @@ export const Simulator: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="pt-2 border-t border-outline-variant/20">
-            <div className="bg-white p-6 rounded-3xl shadow-[0_4px_16px_rgba(26,26,46,0.03)] border border-surface-container flex flex-col gap-3">
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-on-primary-container">Weekly Accuracy</span>
-                {state.weeklyAccuracy !== null && state.weeklyAccuracy >= 50 ? (
-                  <span className="material-symbols-outlined text-secondary text-base">trending_up</span>
-                ) : state.weeklyAccuracy !== null ? (
-                  <span className="material-symbols-outlined text-error text-base">trending_down</span>
-                ) : (
-                  <span className="material-symbols-outlined text-outline-variant text-base">horizontal_rule</span>
-                )}
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-black text-primary tracking-tighter">
-                  {state.weeklyAccuracy !== null ? `${state.weeklyAccuracy}%` : '--'}
-                </span>
-              </div>
-              <p className="text-[10px] text-on-surface-variant font-medium leading-relaxed">
-                Consistency of safe decisions taken over the last 7 days.
-              </p>
-            </div>
-          </div>
-        </aside>
+          </aside>
 
         {/* Right Panel */}
         <section className="flex-1 flex flex-col gap-8 w-full min-w-0">

@@ -40,7 +40,6 @@ interface AppContextType {
   loadHistoryItem: (item: HistoryItem) => void;
   deleteHistoryItem: (id: string) => void;
   clearHistory: () => void;
-  weeklyAccuracy: number | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -90,32 +89,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Auto-sync history to localStorage
   useEffect(() => {
     localStorage.setItem('socio_history', JSON.stringify(history));
-  }, [history]);
-
-  const [weeklyAccuracy, setWeeklyAccuracy] = useState<number | null>(null);
-
-  // Compute Weekly Accuracy
-  useEffect(() => {
-    const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    let safeCount = 0;
-    let totalCount = 0;
-
-    history.forEach(item => {
-      const itemDate = new Date(item.timestamp);
-      if (itemDate >= sevenDaysAgo && item.resultState.riskOutput) {
-        totalCount++;
-        if (item.resultState.riskOutput.riskLevel !== 'high') {
-          safeCount++;
-        }
-      }
-    });
-
-    if (totalCount > 0) {
-      setWeeklyAccuracy(Math.round((safeCount / totalCount) * 100));
-    } else {
-      setWeeklyAccuracy(null);
-    }
   }, [history]);
 
   const saveProfile = (p: UserProfile) => {
@@ -227,7 +200,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         loadHistoryItem,
         deleteHistoryItem,
         clearHistory,
-        weeklyAccuracy,
       }}
     >
       {children}

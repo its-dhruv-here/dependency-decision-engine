@@ -24,6 +24,8 @@ interface AppContextType {
   resetProfile: () => void;
   scenarioInput: string;
   setScenarioInput: (v: string) => void;
+  isPrivateMode: boolean;
+  setPrivateMode: (v: boolean) => void;
   inputSourceType: 'text' | 'pdf' | 'image';
   setInputSourceType: (type: 'text' | 'pdf' | 'image') => void;
   resultState: HistoryItem['resultState'];
@@ -36,6 +38,8 @@ interface AppContextType {
   history: HistoryItem[];
   resetNewCase: () => void;
   loadHistoryItem: (item: HistoryItem) => void;
+  deleteHistoryItem: (id: string) => void;
+  clearHistory: () => void;
   weeklyAccuracy: number | null;
 }
 
@@ -67,6 +71,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [scenarioInput, setScenarioInput] = useState('');
+  const [isPrivateMode, setPrivateMode] = useState(false);
   const [inputSourceType, setInputSourceType] = useState<'text' | 'pdf' | 'image'>('text');
   
   const [resultState, setResultState] = useState<HistoryItem['resultState']>({
@@ -152,15 +157,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       setResultState(newResultState);
       
-      // Save to History
-      const newHistoryItem: HistoryItem = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        scenarioInput,
-        resultState: newResultState,
-      };
-      
-      setHistory(prev => [newHistoryItem, ...prev]);
+      if (!isPrivateMode) {
+        // Save to History
+        const newHistoryItem: HistoryItem = {
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString(),
+          scenarioInput,
+          resultState: newResultState,
+        };
+        setHistory(prev => [newHistoryItem, ...prev]);
+      }
 
     } catch (err) {
       console.error('[STATE] Analysis pipeline failed:', err);
@@ -188,6 +194,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const deleteHistoryItem = (id: string) => {
+    setHistory(prev => prev.filter(item => item.id !== id));
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -197,6 +211,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         resetProfile,
         scenarioInput,
         setScenarioInput,
+        isPrivateMode,
+        setPrivateMode,
         inputSourceType,
         setInputSourceType,
         resultState,
@@ -209,6 +225,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         history,
         resetNewCase,
         loadHistoryItem,
+        deleteHistoryItem,
+        clearHistory,
         weeklyAccuracy,
       }}
     >

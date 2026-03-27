@@ -5,6 +5,7 @@ import { extractTextFromImage, extractTextFromPDF } from '../utils/fileParser';
 export const ScenarioInput: React.FC = () => {
   const {
     scenarioInput, setScenarioInput,
+    isPrivateMode, setPrivateMode,
     errorMsg, setErrorMsg,
     isAnalyzing, isProfileComplete, handleAnalyze,
     setInputSourceType, inputSourceType
@@ -12,8 +13,26 @@ export const ScenarioInput: React.FC = () => {
 
   const [isExtracting, setIsExtracting] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+
+  const placeholders = [
+    "My employer is asking me to work unpaid overtime...",
+    "My salary has been delayed for 2 months, how do I ask for it?",
+    "I'm feeling pressured to sign a document I don't understand...",
+    "My boss is yelling at me in front of others and I feel unsafe...",
+    "They are threatening to cancel my visa if I don't work extra hours..."
+  ];
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isInputTooShort = scenarioInput.trim().length > 0 && scenarioInput.trim().length < 15;
+  const canAnalyze = isProfileComplete && scenarioInput.trim().length >= 15 && !isAnalyzing && !isExtracting;
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -84,6 +103,22 @@ export const ScenarioInput: React.FC = () => {
         </div>
       </div>
 
+      <div className="flex gap-2 flex-wrap pb-2">
+        {['Unpaid Overtime', 'Harassment', 'Salary Delay', 'Job Threat'].map((action) => (
+          <button
+            key={action}
+            onClick={() => {
+              setScenarioInput(`I am experiencing ${action.toLowerCase()} at my current workplace...`);
+              setInputSourceType('text');
+            }}
+            disabled={isExtracting || isAnalyzing}
+            className="text-[10px] font-bold uppercase tracking-wider bg-surface-container-low hover:bg-surface-container-high transition-colors px-3 py-1.5 rounded-full text-on-surface-variant border border-outline-variant/30 active:scale-95"
+          >
+            {action}
+          </button>
+        ))}
+      </div>
+
       <div className="relative">
         {selectedFileName && inputSourceType !== 'text' && (
           <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center bg-white/90 backdrop-blur-sm border border-outline-variant/30 px-3 py-2 rounded-lg shadow-sm">
@@ -110,40 +145,66 @@ export const ScenarioInput: React.FC = () => {
         )}
         
         <textarea
-          className={`w-full p-6 ${selectedFileName && inputSourceType !== 'text' ? 'pt-16' : ''} text-primary rounded-2xl bg-surface-container-low focus:ring-2 focus:ring-primary/10 text-sm resize-none transition-shadow border-none ${errorMsg ? 'ring-2 ring-error/50 bg-error-container/20' : ''}`}
-          placeholder="Example: My boss is asking me to work overtime without pay... Or upload a document using the button above to extract the scenario."
+          className={`w-full p-6 ${selectedFileName && inputSourceType !== 'text' ? 'pt-16' : ''} text-primary rounded-2xl bg-surface-container-low focus:ring-2 focus:ring-primary/10 text-sm resize-none transition-shadow border-none ${errorMsg || isInputTooShort ? 'ring-2 ring-error/50 bg-error-container/20' : ''}`}
+          placeholder={placeholders[placeholderIndex]}
           rows={5}
           value={scenarioInput}
+          disabled={isAnalyzing || isExtracting}
           onChange={e => {
             setScenarioInput(e.target.value);
-            // If user types, we revert to text, but we don't necessarily clear the filename unless they want to. 
-            // The prompt says "Allow user to edit extracted text". So we want to keep it as "from a document" until they clear it!
             if (errorMsg) setErrorMsg('');
           }}
         />
-        {errorMsg && (
-          <p className="absolute -bottom-6 left-2 text-error text-[10px] font-bold uppercase tracking-wider">{errorMsg}</p>
-        )}
+        <div className="flex justify-between items-center mt-2 px-1">
+          {isInputTooShort ? (
+            <p className="text-error text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+              <span className="material-symbols-outlined text-[14px]">info</span>
+              Please add more details for a better result
+            </p>
+          ) : (
+            <p className="text-on-surface-variant/60 text-[10px] font-bold uppercase tracking-wider">
+              {scenarioInput.length > 0 ? "Be specific for better results" : "Your privacy is protected"}
+            </p>
+          )}
+          {errorMsg && (
+            <p className="text-error text-[10px] font-bold uppercase tracking-wider">{errorMsg}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end gap-2 pt-2 pb-2">
+        <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant flex items-center gap-2 cursor-pointer">
+          <input 
+            type="checkbox" 
+            checked={isPrivateMode}
+            onChange={(e) => setPrivateMode(e.target.checked)}
+            disabled={isAnalyzing || isExtracting}
+            className="w-4 h-4 rounded text-primary border-outline-variant/30 focus:ring-primary/20 transition-all bg-surface-container cursor-pointer disabled:opacity-50"
+          />
+          Do not save this case
+        </label>
       </div>
 
       <button
         onClick={handleAnalyze}
-        disabled={isAnalyzing || isExtracting || !isProfileComplete}
+        disabled={!canAnalyze}
         className={`w-full text-white py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-          isAnalyzing || isExtracting || !isProfileComplete 
-            ? 'bg-surface-container-highest cursor-not-allowed opacity-70' 
+          !canAnalyze 
+            ? 'bg-surface-container-highest cursor-not-allowed opacity-70 shadow-none' 
             : 'gradient-primary shadow-xl shadow-primary/20 hover:-translate-y-1 active:scale-95'
         }`}
       >
         {isAnalyzing ? (
           <>
-            <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Analyzing...
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            Analyzing Situation...
           </>
-        ) : 'Analyze Situation'}
+        ) : (
+          <>
+            <span className="material-symbols-outlined text-[20px]">psychology</span>
+            Analyze Situation
+          </>
+        )}
       </button>
     </div>
   );

@@ -1,7 +1,7 @@
 export interface UserProfile {
   visaType: 'employer' | 'family';
   dependencyLevel: 'high' | 'medium' | 'low';
-  financialPressure: 'high' | 'low';
+  financialPressure: 'high' | 'medium' | 'low';
 }
 
 export interface Scenario {
@@ -10,11 +10,19 @@ export interface Scenario {
   severity: 'high' | 'medium' | 'low';
   intent: string;
   sourceType?: 'text' | 'pdf' | 'image';
+  tags?: string[];
+  confidence?: number;
+  originalLanguage?: string;
 }
 
 export interface RiskOutput {
   riskLevel: 'high' | 'medium' | 'low';
+  riskScore: number;
   reasons: string[];
+  shortTermRisk?: 'high' | 'medium' | 'low';
+  longTermRisk?: 'high' | 'medium' | 'low';
+  reasonRisky?: string;
+  reasonSafe?: string;
 }
 
 export interface Decision {

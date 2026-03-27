@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { callLLMForExplanation, callLLMForFollowup } from '../utils/llm';
+import { UserProfile } from '../types';
 
 interface Props {
   context: string;
+  profile: UserProfile;
 }
 
-export const ExplainChat: React.FC<Props> = ({ context }) => {
+export const ExplainChat: React.FC<Props> = ({ context, profile }) => {
   const [explanation, setExplanation] = useState('');
   const [isLoadingMain, setIsLoadingMain] = useState(false);
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'assistant'; text: string }[]>([]);
@@ -39,10 +41,10 @@ export const ExplainChat: React.FC<Props> = ({ context }) => {
     setIsAsking(true);
 
     try {
-      const answer = await callLLMForFollowup(userQ, `Situation: ${context}\nExplanation: ${explanation}`);
-      setChatHistory(prev => [...prev, { role: 'assistant', text: answer || 'Could not process that. Please try again.' }]);
+      const answer = await callLLMForFollowup(userQ, `Situation: ${context}\nExplanation: ${explanation}`, profile);
+      setChatHistory(prev => [...prev, { role: 'assistant', text: answer || 'Unable to fetch explanation, please try again.' }]);
     } catch {
-      setChatHistory(prev => [...prev, { role: 'assistant', text: 'Something went wrong. Please try again.' }]);
+      setChatHistory(prev => [...prev, { role: 'assistant', text: 'Unable to fetch explanation, please try again.' }]);
     } finally {
       setIsAsking(false);
     }

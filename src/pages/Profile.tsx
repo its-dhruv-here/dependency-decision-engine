@@ -1,8 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { UserProfile } from '../types';
 import { useAppContext } from '../state/AppContext';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+
+// Compute a human-readable risk profile label from the current settings
+function computeRiskProfile(p: UserProfile): { label: string; detail: string; focusLabel: string; focusDetail: string } {
+  const depScore = p.dependencyLevel === 'high' ? 3 : p.dependencyLevel === 'medium' ? 2 : 1;
+  const finScore = p.financialPressure === 'high' ? 3 : p.financialPressure === 'medium' ? 2 : 1;
+  const combined = depScore + finScore; // 2 – 6
+
+  let label: string;
+  let detail: string;
+  let focusLabel: string;
+  let focusDetail: string;
+
+  if (combined >= 5) {
+    label = 'High Risk Profile';
+    detail = 'Your high dependency and financial pressure significantly limit safe options. The simulator will prioritize cautious, protective strategies.';
+    focusLabel = 'Protection';
+    focusDetail = 'Prioritizing safety, documentation, and exit planning over confrontation.';
+  } else if (combined >= 3) {
+    label = 'Balanced Risk Profile';
+    detail = 'Moderate risk tolerance with focus on long-term growth.';
+    focusLabel = 'Stability';
+    focusDetail = 'Prioritizing job security and consistent income streams.';
+  } else {
+    label = 'Low Risk Profile';
+    detail = 'Your low dependency and financial flexibility give you strong negotiation power. The simulator will offer bolder strategies.';
+    focusLabel = 'Growth';
+    focusDetail = 'Prioritizing boundary-setting and career advancement over compliance.';
+  }
+
+  return { label, detail, focusLabel, focusDetail };
+}
 
 export const Profile: React.FC = () => {
   const { profile: globalProfile, saveProfile, resetProfile } = useAppContext();
@@ -15,6 +46,8 @@ export const Profile: React.FC = () => {
   useEffect(() => {
     setLocalProfile(globalProfile);
   }, [globalProfile]);
+
+  const riskProfile = useMemo(() => computeRiskProfile(localProfile), [localProfile]);
 
   const handleDependencyChange = (val: string) => {
     const map: Record<string, 'low' | 'medium' | 'high'> = { '1': 'low', '2': 'medium', '3': 'high' };
@@ -70,8 +103,8 @@ export const Profile: React.FC = () => {
                 <span className="text-xs font-bold uppercase tracking-wider">Risk Profile</span>
               </div>
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/10">
-                <div className="text-lg font-bold text-primary">Balanced</div>
-                <div className="text-[0.7rem] text-outline mt-1 font-medium">Moderate risk tolerance with focus on long-term growth.</div>
+                <div className="text-lg font-bold text-primary">{riskProfile.label.replace(' Risk Profile', '')}</div>
+                <div className="text-[0.7rem] text-outline mt-1 font-medium">{riskProfile.detail}</div>
               </div>
             </div>
             
@@ -81,8 +114,8 @@ export const Profile: React.FC = () => {
                 <span className="text-xs font-bold uppercase tracking-wider">Current Focus</span>
               </div>
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/10">
-                <div className="text-lg font-bold text-primary">Stability</div>
-                <div className="text-[0.7rem] text-outline mt-1 font-medium">Prioritizing job security and consistent income streams.</div>
+                <div className="text-lg font-bold text-primary">{riskProfile.focusLabel}</div>
+                <div className="text-[0.7rem] text-outline mt-1 font-medium">{riskProfile.focusDetail}</div>
               </div>
             </div>
           </div>
@@ -107,7 +140,7 @@ export const Profile: React.FC = () => {
             <div className="flex items-center gap-4 p-4 mb-8 bg-secondary-container/20 border border-secondary-container/30 rounded-2xl">
               <span className="material-symbols-outlined text-secondary">verified_user</span>
               <p className="text-on-secondary-container font-medium text-sm">
-                Your current settings provide a <span className="font-bold underline decoration-secondary/30">Balanced Risk Profile</span>.
+                Your current settings provide a <span className="font-bold underline decoration-secondary/30">{riskProfile.label}</span>.
               </p>
             </div>
             <p className="text-on-surface-variant text-lg max-w-2xl leading-relaxed">
@@ -227,13 +260,13 @@ export const Profile: React.FC = () => {
                   <div className="flex items-start space-x-4">
                     <div className="w-2 h-2 rounded-full bg-secondary mt-1.5 shrink-0"></div>
                     <p className="text-sm text-on-surface-variant leading-relaxed">
-                      Your current settings provide a <span className="font-bold text-primary">Balanced Risk Profile</span>.
+                      Your current settings provide a <span className="font-bold text-primary">{riskProfile.label}</span>.
                     </p>
                   </div>
                   <div className="flex items-start space-x-4">
                     <div className="w-2 h-2 rounded-full bg-primary-container mt-1.5 shrink-0"></div>
                     <p className="text-sm text-on-surface-variant leading-relaxed">
-                      Financial outcomes are weighted for <span className="font-bold text-primary">Stability</span>.
+                      Financial outcomes are weighted for <span className="font-bold text-primary">{riskProfile.focusLabel}</span>.
                     </p>
                   </div>
                 </div>
@@ -244,7 +277,7 @@ export const Profile: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent flex items-end p-6">
                   <div>
                     <p className="text-white/70 text-xs font-bold tracking-widest uppercase mb-1">Current Focus</p>
-                    <p className="text-white text-xl font-bold">Workspace Stability</p>
+                    <p className="text-white text-xl font-bold">Workspace {riskProfile.focusLabel}</p>
                   </div>
                 </div>
               </div>
